@@ -3403,20 +3403,26 @@ PivotViewer.Views.Tile = Object.subClass({
         var imgXOffset=15;
         var imgYOffset=20;
         var drawText = true;
+        var lineWidth = 3;
+        var lineoffsetx = 2, lineoffsety = 2;
         var drawExtendedText = false;
 
         var completeImageHeight = this._controller.GetHeight(this.facetItem.Img);
         var displayHeight = this.height - 8;
 
-        if(displayHeight < completeImageHeight){
+        if(displayHeight < completeImageHeight+50){
             //Render small layout
-            imgXOffset = 7;
-            imgYOffset = 7;
+            imgXOffset = 1;
+            imgYOffset = 1;
             drawText = false;
+            lineWidth = 2;
         }
         if(displayHeight > 300){
             //Render large layout
             drawExtendedText = true;
+            lineWidth = 4;
+            lineoffsetx = 4;
+            lineoffsety = 4;
         }
 
 
@@ -3434,29 +3440,29 @@ PivotViewer.Views.Tile = Object.subClass({
             }
             if(currentFacet.Name === 'Blocked'){
                 if(currentFacet.FacetValues[0].Value === 'true'){
-                    this._drawBorder('#FF0000', this);
+                    this._drawBorder('#FF0000', this, lineWidth, lineoffsetx, lineoffsety);
                 }
             }
             if(currentFacet.Name === 'Ready'){
                 if(currentFacet.FacetValues[0].Value ==='true'){
-                    this._drawBorder('#00FF00', this);
+                    this._drawBorder('#00FF00', this, lineWidth, lineoffsetx, lineoffsety);
                 }
             }
             if(currentFacet.Name === 'Accepted Date'){
                 if(currentFacet.FacetValues[0].Value != ""){
-                    this._drawBorder('#0000FF', this);
+                    this._drawBorder('#0000FF', this, lineWidth, lineoffsetx, lineoffsety);
                 }
             }
             if(currentFacet.Name === 'FormattedID' && drawText){
                 this._drawText(currentFacet.FacetValues[0].Value, this, 15, 15);
             }
             if(currentFacet.Name === 'Name' && drawExtendedText){
-                this._drawText(currentFacet.FacetValues[0].Value, this, 15, 335);
+                this._drawText(currentFacet.FacetValues[0].Value, this, 15, 300);
             }
         }
 
         if (this._selected) {
-            this._drawBorder('#92C4E1', this);
+            this._drawBorder('#92C4E1', this, lineWidth, lineoffsetx, lineoffsety);
         }
 
     },
@@ -3474,23 +3480,21 @@ PivotViewer.Views.Tile = Object.subClass({
         //var displayWidth = Math.ceil(tileObj._controller.GetWidthForImage(tileObj.facetItem.Img, displayHeight));
 
         //Image will need to be scaled to get the displayHeight
-        var scale = tileObj.height/tileObj.origheight ;
-        if(scale > 2)
-            scale =2 ;
+        var scale = tileObj.height/tileObj.origheight;
+        if(scale > 3)
+            scale = 3;
 
-        var imageTileHeight = Math.ceil(image.height * scale);
-        var imageTileWidth = Math.ceil(image.width * scale);
+        var imageTileHeight = scale > 1.1 ? Math.ceil(tileObj.height * (1/scale))-2 : Math.ceil(tileObj.height * 0.8)-2;
+//        imageTileHeight = Math.min(imageTileHeight, image.height*3);
 
-        tileObj.context.drawImage(image, tileObj._locations[tileObj.selectedLoc].x+imgXOffset , tileObj._locations[tileObj.selectedLoc].y+imgYOffset, imageTileWidth, imageTileHeight);
+        tileObj.context.drawImage(image, tileObj._locations[tileObj.selectedLoc].x+imgXOffset , tileObj._locations[tileObj.selectedLoc].y+imgYOffset, imageTileHeight, imageTileHeight);
 
     },
-    _drawBorder: function(hexColor, tileObj){
+    _drawBorder: function(hexColor, tileObj, lineWidth, offsetx, offsety){
         //draw a blue border
         tileObj.context.beginPath();
-        var offsetx = 4;
-        var offsety = 4;
         tileObj.context.rect(offsetx + tileObj._locations[tileObj.selectedLoc].x , offsety + tileObj._locations[tileObj.selectedLoc].y, tileObj.width -8, tileObj.height - 8);
-        tileObj.context.lineWidth = 4;
+        tileObj.context.lineWidth = lineWidth;
         tileObj.context.strokeStyle = hexColor;
         tileObj.context.stroke();
     },
@@ -3970,7 +3974,7 @@ PivotViewer.Views.DeepZoomItem = Object.subClass({    init: function (ItemId, DZ
 
     InitPreloader = function () {
         //http://gifmake.com/
-        _self.append("<div class='pv-loading'><img src='images/loading.gif' alt='Loading' /><span>Loading...</span></div>");
+        _self.append("<div class='pv-loading'><img src='images/loading.gif' alt='Loading' /><span id='lblLoading'>Loading...</span></div>");
         $('.pv-loading').css('top', ($('.pv-wrapper').height() / 2) - 33 + 'px');
         $('.pv-loading').css('left', ($('.pv-wrapper').width() / 2) - 43 + 'px');
     };
@@ -4362,8 +4366,8 @@ PivotViewer.Views.DeepZoomItem = Object.subClass({    init: function (ItemId, DZ
         //Create instances of all the views
         _views.push(new PivotViewer.Views.GridView());
         _views.push(new PivotViewer.Views.GraphView());
-        _views.push(new PivotViewer.Views.TableView());
-        _views.push(new PivotViewer.Views.MapView());
+        //_views.push(new PivotViewer.Views.TableView());
+        //_views.push(new PivotViewer.Views.MapView());
 
         //init the views interfaces
         for (var i = 0; i < _views.length; i++) {
@@ -4382,8 +4386,8 @@ PivotViewer.Views.DeepZoomItem = Object.subClass({    init: function (ItemId, DZ
         }
 
        // The table and the map view needs to know about the facet categories
-       _views[2].SetFacetCategories(PivotCollection);
-       _views[3].SetFacetCategories(PivotCollection);
+//       _views[2].SetFacetCategories(PivotCollection);
+//       _views[3].SetFacetCategories(PivotCollection);
 
     };
 

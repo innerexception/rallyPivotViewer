@@ -19,27 +19,9 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
         this.collection.CollectionBaseNoProxy = this.JSONUriNoProxy;
         this.collection.CollectionBase = this.JSONUri;
 
-        var myRequest = new XMLHttpRequest();
-
-        myRequest.withCredentials = true;
-        myRequest.open('GET', this.JSONUri);
-        myRequest.context = this;
-        myRequest.onreadystatechange = function () {
-            if (this.status == 200 && this.readyState == 4) {
-                this.context.JSONLoaded($.parseJSON(this.responseText));
-            }
-            else if(this.status != 200){
-                this.context.JSONLoadFailed(this);
-            }
-        };
-        myRequest.send();
-
-    },
-    _hydrateCollections: function(data){
-
-        data = data.QueryResult;
-        data.CollectionName = 'Artifacts in Kumquats';
-        data.FacetCategories = {
+        this.data = {};
+        this.data.CollectionName = 'Artifacts in Kumquats';
+        this.data.FacetCategories = {
             "FacetCategory": [
                 {
                     "Name": "Name",
@@ -54,20 +36,8 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
                     "IsMetaDataVisible": "true"
                 },
                 {
-                    "Name": "Workspace",
-                    "Type": "String",
-                    "IsFilterVisible": "true",
-                    "IsMetaDataVisible": "true"
-                },
-                {
-                    "Name": "Subscription",
-                    "Type": "String",
-                    "IsFilterVisible": "true",
-                    "IsMetaDataVisible": "true"
-                },
-                {
                     "Name": "Expedite",
-                    "Type": "Boolean",
+                    "Type": "String",
                     "IsFilterVisible": "true",
                     "IsMetaDataVisible": "true"
                 },
@@ -79,7 +49,7 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
                 },
                 {
                     "Name": "Blocked",
-                    "Type": "Boolean",
+                    "Type": "String",
                     "IsFilterVisible": "true",
                     "IsMetaDataVisible": "true"
                 },
@@ -91,12 +61,12 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
                 },
                 {
                     "Name": "Ready",
-                    "Type": "Boolean",
+                    "Type": "String",
                     "IsFilterVisible": "true",
                     "IsMetaDataVisible": "true"
                 },
                 {
-                    "Name": "Accepted Date",
+                    "Name": "Closed Date",
                     "Type": "DateTime",
                     "IsFilterVisible": "true",
                     "IsMetaDataVisible": "true"
@@ -110,29 +80,111 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
                 {
                     "Name": "FormattedID",
                     "Type": "String",
-                    "IsFilterVisible": "false",
-                    "IsMetaDataVisible" : "false"
+                    "IsFilterVisible": "true",
+                    "IsMetaDataVisible" : "false",
+                    "IsWordWheelVisible" : "true"
+                },
+                {
+                    "Name": "Fixed In Build",
+                    "Type": "String",
+                    "IsFilterVisible": "true",
+                    "IsMetaDataVisible" : "false",
+                    "IsWordWheelVisible" : "true"
+                },
+                {
+                    "Name": "Priority",
+                    "Type": "String",
+                    "IsFilterVisible": "true",
+                    "IsMetaDataVisible" : "false",
+                    "IsWordWheelVisible" : "true"
+                },
+                {
+                    "Name": "Severity",
+                    "Type": "String",
+                    "IsFilterVisible": "true",
+                    "IsMetaDataVisible" : "false",
+                    "IsWordWheelVisible" : "true"
+                },
+                {
+                    "Name": "State",
+                    "Type": "String",
+                    "IsFilterVisible": "true",
+                    "IsMetaDataVisible" : "false",
+                    "IsWordWheelVisible" : "true"
+                },
+                {
+                    "Name": "Task Estimate",
+                    "Type": "Number",
+                    "IsMetaDataVisible": "true"
                 }
             ]
         };
 
-        data.Items = {
+        this.data.Items = {
             ImgBase: location.origin+'/rallypivotviewer/images',
             Item: []
         };
 
-        this.totalItems = data.Results.length-1;
-        this.itemsLoaded = 0;
+        this._makeXHR(this.JSONUri);
 
-        for(var i=0; i<this.totalItems; i++){
-            var myRequest = new XMLHttpRequest();
+    },
+    _makeXHR: function(url){
+        var myRequest = new XMLHttpRequest();
+
+        myRequest.withCredentials = true;
+        myRequest.open('GET', url);
+        console.log('Request sent: '+url);
+        myRequest.context = this;
+        myRequest.onreadystatechange = function () {
+            if (this.status == 200 && this.readyState == 4) {
+                this.context.JSONLoaded($.parseJSON(this.responseText));
+            }
+            else if(this.status != 200){
+                this.context.JSONLoadFailed(this);
+            }
+        };
+        myRequest.send();
+    },
+    JSONLoaded: function(data){
+        console.log('JSON start loading '+data.QueryResult.StartIndex+' record');
+        this._hydrateCollections(data);
+    },
+    JSONLoadFailed: function(jqXHR, textStatus, errorThrown) {
+        //Make sure throbber is removed else everyone thinks the app is still running
+        $('.pv-loading').remove();
+
+        //Display a message so the user knows something is wrong
+        var msg = '';
+        msg = msg + 'Error loading CXML Collection<br><br>';
+        msg = msg + 'URL        : ' + this.url + '<br>';
+        msg = msg + 'Status : ' + jqXHR.status + ' ' + errorThrown + '<br>';
+        msg = msg + 'Details    : ' + jqXHR.responseText + '<br>';
+        msg = msg + '<br>Pivot Viewer cannot continue until this problem is resolved<br>';
+        $('.pv-wrapper').append("<div id=\"pv-loading-error\" class=\"pv-modal-dialog\"><div><a href=\"#pv-modal-dialog-close\" title=\"Close\" class=\"pv-modal-dialog-close\">X</a><h2>HTML5 PivotViewer</h2><p>" + msg + "</p></div></div>");
+        var t=setTimeout(function(){window.open("#pv-loading-error","_self")},1000)
+    },
+    _hydrateCollections: function(data){
+
+        data = data.QueryResult;
+        if(data.StartIndex === 1){
+            this.totalItems = Math.min(data.TotalResultCount-1, 1000);
+            if(this.totalItems === 1000){
+                $('#lblLoading').text("Loaded: 0 / "+this.totalItems);
+            }
+            this.pageSize = data.PageSize;
+            this.itemsLoaded = 0;
+        }
+
+        for(var i=0; i<this.pageSize; i++){
             var currentItem = data.Results[i];
+
+            var myRequest = new XMLHttpRequest();
             myRequest.withCredentials = true;
             myRequest.open('GET', currentItem._ref);
             myRequest.context = this;
             myRequest.onreadystatechange = function () {
-                if (this.status == 200 && this.readyState == 4 && this.context.itemsLoaded != this.context.totalItems) {
-                    this.context._loadNextArtifact($.parseJSON(this.responseText), data, this.context.itemsLoaded);
+                if (this.status == 200 && this.readyState == 4 && this.context.itemsLoaded < this.context.totalItems) {
+                    this.context._loadNextArtifact($.parseJSON(this.responseText), this.context.itemsLoaded);
                 }
                 else if(this.status != 200){
                     this.context.JSONLoadFailed(this);
@@ -140,9 +192,18 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
             };
             myRequest.send();
         }
+        if(data.StartIndex === 1){
+            var pages = this.totalItems/this.pageSize;
+            for(i=1; i<pages; i++){
+                this._loadNextDataPage((i*this.pageSize)+1);
+            }
+        }
     },
 
-    _loadNextArtifact: function(newData, data, newId){
+    _loadNextDataPage: function(startIndex){
+        this._makeXHR(this.JSONUri + '&start='+startIndex);
+    },
+    _loadNextArtifact: function(newData, newId){
 
         var currentType;
 
@@ -156,7 +217,7 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
         }
 
         var item = {};
-        item.Name = newData.Name;
+        item.Name = newData.FormattedID;
         item.Description = newData.Description;
         item.Extension = "\n\t";
         item.Id = newId;
@@ -170,25 +231,13 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
         item.Facets.Facet.push(
             {
                 "String": {
-                    "Value": newData.Subscription ? newData.Subscription._refObjectName : ""
-                },
-                "Name": "Subscription"
-            },
-            {
-                "String": {
                     "Value": newData.Name ? newData.Name : ""
                 },
                 "Name": "Name"
             },
             {
                 "String": {
-                    "Value": newData.Workspace ? newData.Workspace._refObjectName : ""
-                },
-                "Name": "Workspace"
-            },
-            {
-                "Boolean": {
-                    "Value": newData.Expedite ? newData.Expedite : ""
+                    "Value": newData.Expedite ? "true" : "false"
                 },
                 "Name": "Expedite"
             },
@@ -205,8 +254,8 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
                 "Name": "Creation Date"
             },
             {
-                "Boolean": {
-                    "Value": newData.Blocked ? newData.Blocked : ""
+                "String": {
+                    "Value": newData.Blocked ? "true" : "false"
                 },
                 "Name": "Blocked"
             },
@@ -229,8 +278,8 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
                 "Name": "Accepted Date"
             },
             {
-                "Boolean": {
-                    "Value": newData.Ready ? newData.Ready : ""
+                "String": {
+                    "Value": newData.Ready ? "true" : "false"
                 },
                 "Name": "Ready"
             },
@@ -239,19 +288,57 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
                     "Value": newData.FormattedID ? newData.FormattedID : ""
                 },
                 "Name": "FormattedID"
+            },
+            {
+                "String":{
+                    "Value": newData.FixedInBuild ? newData.FixedInBuild : ""
+                },
+                "Name": "Fixed In Build"
+            },
+            {
+                "String":{
+                    "Value": newData.Priority ? newData.Priority : ""
+                },
+                "Name": "Priority"
+            },
+            {
+                "String":{
+                    "Value": newData.Severity ? newData.Severity : ""
+                },
+                "Name": "Severity"
+            },
+            {
+                "String":{
+                    "Value": newData.State ? newData.State : ""
+                },
+                "Name": "State"
+            },
+            {
+                "Number":{
+                    "Value": newData.TaskEstimateTotal ? newData.TaskEstimateTotal: 0
+                },
+                "Name": "Task Estimate"
+            },
+            {
+                "DateTime":{
+                    "Value": newData.ClosedDate ? newData.ClosedDate : ""
+                },
+                "Name": "Closed Date"
             }
         );
 
-        data.Items.Item.push(item);
+        this.data.Items.Item.push(item);
         this.itemsLoaded++;
+        $('#lblLoading').text("Loaded: "+this.itemsLoaded + " / " + this.totalItems);
 
         if(this.itemsLoaded === this.totalItems){
-            this._continueLoad(data);
+            this._continueLoad(this.data);
         }
 
     },
 
     _continueLoad: function(data){
+        console.log('---Load Complete, continuing render---');
         if (data.FacetCategories == undefined || data.Items == undefined) {
             //Make sure throbber is removed else everyone thinks the app is still running
             $('.pv-loading').remove();
@@ -414,25 +501,6 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
         if (data.Items.Item.length > 0)
             $.publish("/PivotViewer/Models/Collection/Loaded", null);
 
-    },
-    JSONLoaded: function(data){
-        Debug.Log('JSON loaded');
-
-        this._hydrateCollections(data);
-
-    },
-    JSONLoadFailed: function(jqXHR, textStatus, errorThrown) {
-        //Make sure throbber is removed else everyone thinks the app is still running
-        $('.pv-loading').remove();
-
-        //Display a message so the user knows something is wrong
-        var msg = '';
-        msg = msg + 'Error loading CXML Collection<br><br>';
-        msg = msg + 'URL        : ' + this.url + '<br>';
-        msg = msg + 'Status : ' + jqXHR.status + ' ' + errorThrown + '<br>';
-        msg = msg + 'Details    : ' + jqXHR.responseText + '<br>';
-        msg = msg + '<br>Pivot Viewer cannot continue until this problem is resolved<br>';
-        $('.pv-wrapper').append("<div id=\"pv-loading-error\" class=\"pv-modal-dialog\"><div><a href=\"#pv-modal-dialog-close\" title=\"Close\" class=\"pv-modal-dialog-close\">X</a><h2>HTML5 PivotViewer</h2><p>" + msg + "</p></div></div>");
-        var t=setTimeout(function(){window.open("#pv-loading-error","_self")},1000)
     }
+
 });
