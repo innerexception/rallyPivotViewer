@@ -27,7 +27,7 @@
                 currentProject = 202870644941;
                 currentQuery = location.search.substring(location.search.indexOf('=')+1);
                 $('#pivotviewer').PivotViewer({
-                    //Loader: new PivotViewer.Models.Loaders.JSONLoader("http://localhost:7001/slm/webservice/v2.0/hierarchicalrequirement?projectId="+currentProject),
+                    //http://localhost:63342/rallyPivotViewer/index.html?wsapiQuery=artifact?project=/project/2870644941&projectScopeUp=false&projectScopeDown=true&query=(CreationDate%20%3E%20%222013-12-12%22)&pagesize=200&fetch=Project#pv-modal-dialog-close
                     Loader: new PivotViewer.Models.Loaders.JSONLoader("https://rally1.rallydev.com/slm/webservice/v2.0/"+currentQuery),//"artifact?project%20=202870644941&query=(ScheduleState%20=%20%22Defined%22)&pagesize=200"
                     ImageController: new PivotViewer.Views.SimpleImageController(),
                     ViewerState: "$view$=1"

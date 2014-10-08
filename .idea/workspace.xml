@@ -64,10 +64,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="index.html" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="22" column="52" selection-start="1403" selection-end="1403" vertical-scroll-proportion="-13.75" vertical-offset="0" max-vertical-offset="660">
+            <state line="38" column="0" selection-start="2359" selection-end="2359" vertical-scroll-proportion="0.6620209" vertical-offset="0" max-vertical-offset="861">
               <folding>
                 <element signature="n#style#0;n#div#0;n#body#0;n#!!top" expanded="true" />
               </folding>
@@ -132,10 +132,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="rallyJsonLoader.js" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="rallyJsonLoader.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/js/src/rallyJsonLoader.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="70" column="17" selection-start="2542" selection-end="2542" vertical-scroll-proportion="0.6101695" vertical-offset="435" max-vertical-offset="7260">
+            <state line="62" column="18" selection-start="2261" selection-end="2261" vertical-scroll-proportion="0.0" vertical-offset="450" max-vertical-offset="7260">
               <folding>
                 <element signature="e#4582#5476#0" expanded="false" />
               </folding>
@@ -163,10 +163,10 @@
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/css/pivotviewer.css" />
-        <option value="$PROJECT_DIR$/index.html" />
         <option value="$PROJECT_DIR$/images/imagelist.json" />
         <option value="$PROJECT_DIR$/js/src/pivotviewer.js" />
         <option value="$PROJECT_DIR$/js/src/rallyJsonLoader.js" />
+        <option value="$PROJECT_DIR$/index.html" />
       </list>
     </option>
   </component>
@@ -417,12 +417,12 @@
       <updated>1412708204724</updated>
       <workItem from="1412708208123" duration="38000" />
       <workItem from="1412708258446" duration="165000" />
-      <workItem from="1412708457019" duration="28623000" />
+      <workItem from="1412708457019" duration="29839000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="28826000" />
+    <option name="totallyTimeSpent" value="30042000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="13" y="22" width="2546" height="1414" extended-state="6" />
@@ -503,15 +503,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="52" selection-start="1403" selection-end="1403" vertical-scroll-proportion="-13.75" vertical-offset="0" max-vertical-offset="660">
-          <folding>
-            <element signature="n#style#0;n#div#0;n#body#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/images/imagelist.json">
       <provider selected="true" editor-type-id="text-editor">
         <state line="10" column="0" selection-start="150" selection-end="150" vertical-scroll-proportion="-6.25" vertical-offset="0" max-vertical-offset="240">
@@ -576,9 +567,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/js/src/rallyJsonLoader.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="70" column="17" selection-start="2542" selection-end="2542" vertical-scroll-proportion="0.6101695" vertical-offset="435" max-vertical-offset="7260">
+        <state line="62" column="18" selection-start="2261" selection-end="2261" vertical-scroll-proportion="0.0" vertical-offset="450" max-vertical-offset="7260">
           <folding>
             <element signature="e#4582#5476#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="38" column="0" selection-start="2359" selection-end="2359" vertical-scroll-proportion="0.6620209" vertical-offset="0" max-vertical-offset="861">
+          <folding>
+            <element signature="n#style#0;n#div#0;n#body#0;n#!!top" expanded="true" />
           </folding>
         </state>
       </provider>
