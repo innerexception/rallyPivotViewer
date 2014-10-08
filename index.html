@@ -20,14 +20,12 @@
         <script src="js/src/simpleImageLoader.js" type="text/javascript"></script>
     </head>
     <body onload="init()">
-        <h2>HTML5 Citrus Rally Data Pivot Demo</h2>
         <div id="pivotviewer" style="height:600px;">
         </div>
         <script type="text/javascript">
             function init(){
                 currentProject = 202870644941;
                 currentQuery = location.search.substring(location.search.indexOf('=')+1);
-
                 $('#pivotviewer').PivotViewer({
                     //Loader: new PivotViewer.Models.Loaders.JSONLoader("http://localhost:7001/slm/webservice/v2.0/hierarchicalrequirement?projectId="+currentProject),
                     Loader: new PivotViewer.Models.Loaders.JSONLoader("https://rally1.rallydev.com/slm/webservice/v2.0/"+currentQuery),//"artifact?project%20=202870644941&query=(ScheduleState%20=%20%22Defined%22)&pagesize=200"

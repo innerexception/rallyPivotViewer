@@ -2761,7 +2761,7 @@ PivotViewer.Views.TableView = PivotViewer.Views.IPivotViewerView.subClass({
                       if (this.tiles[j].facetItem.Description) {
                           // Link out image if item has href
                           if (this.tiles[j].facetItem.Href) {
-                              tableRows.push({key: sortKeyValue, value: "<tr class='pv-tableview-" + oddOrEven +"'><td id='pv-key' class='tooltipinter' title='Toggle item selection' style='color:#009933;cursor:pointer'>" + entity + " " + "<a href=" + this.tiles[j].facetItem.Href.replace(/'/g, "%27") + " target=\"_blank\"><img style='cursor:default;' id='pv-linkout' title='Follow the link' title='Follow the link' src='images/goout.gif'></img></a></a></td><td id='pv-facet' class='tooltipcustom' title='Show only this relation' style='color:#009933;cursor:pointer'>Description</td><td id='pv-value'>" + this.tiles[j].facetItem.Description + "</td></tr>"});
+                              tableRows.push({key: sortKeyValue, value: "<tr class='pv-tableview-" + oddOrEven +"'><td id='pv-key' class='tooltipinter' title='Toggle item selection' style='color:#009933;cursor:pointer'>" + entity + " " + "<a href=" + this.tiles[j].facetItem.Href.replace(/'/g, "%27") + " target=\"_blank\"><img style='cursor:default;' id='pv-linkout' title='Follow the link' title='Follow the link' src='images/goout.gif'></img></a></a></td><td id='pv-facet' class='tooltipcustom' title='Show only this relation' style='color:#009933;cursor:pointer'>Description</td><td id='pv-value'>" + $.parseHTML(this.tiles[j].facetItem.Description) + "</td></tr>"});
                           } else {
                               tableRows.push({key: sortKeyValue, value: "<tr class='pv-tableview-" + oddOrEven +"'><td id='pv-key' class='tooltip' title='Toggle item selection'>" + entity + "</td><td id='pv-facet' class='tooltipcustom' title='Show only this relation' style='color:#009933;cursor:pointer'>Description</td><td id='pv-value'>" + this.tiles[j].facetItem.Description + "</td></tr>"});
                           }
@@ -3410,7 +3410,7 @@ PivotViewer.Views.Tile = Object.subClass({
         var completeImageHeight = this._controller.GetHeight(this.facetItem.Img);
         var displayHeight = this.height - 8;
 
-        if(displayHeight < completeImageHeight+50){
+        if(displayHeight < completeImageHeight){
             //Render small layout
             imgXOffset = 1;
             imgYOffset = 1;
@@ -3436,6 +3436,18 @@ PivotViewer.Views.Tile = Object.subClass({
                 }
                 if(currentFacet.FacetValues[0].Value === 'User Story'){
                     this._drawImage(this._controller._items[1].Images[0], this, imgXOffset, imgYOffset);
+                }
+                if(currentFacet.FacetValues[0].Value === 'Initiative'){
+                    this._drawImage(this._controller._items[4].Images[0], this, imgXOffset, imgYOffset);
+                }
+                if(currentFacet.FacetValues[0].Value === undefined){
+                    this._drawImage(this._controller._items[2].Images[0], this, imgXOffset, imgYOffset);
+                }
+                if(currentFacet.FacetValues[0].Value === 'Feature'){
+                    this._drawImage(this._controller._items[3].Images[0], this, imgXOffset, imgYOffset);
+                }
+                if(currentFacet.FacetValues[0].Value === 'Task'){
+                    this._drawImage(this._controller._items[5].Images[0], this, imgXOffset, imgYOffset);
                 }
             }
             if(currentFacet.Name === 'Blocked'){
@@ -4054,7 +4066,7 @@ PivotViewer.Views.DeepZoomItem = Object.subClass({    init: function (ItemId, DZ
         var brandImage = PivotCollection.BrandImage;
         if (brandImage.length > 0)
             toolbarPanel += "<img class='pv-toolbarpanel-brandimage' src='" + brandImage + "'></img>";
-        toolbarPanel += "<span class='pv-toolbarpanel-name'>" + PivotCollection.CollectionName + "</span>";
+        toolbarPanel += "<span class='pv-toolbarpanel-name'>" + 'WSAPI Query: ' +currentQuery + "</span>";
         toolbarPanel += "<div class='pv-toolbarpanel-facetbreadcrumb'></div>";
         toolbarPanel += "<div class='pv-toolbarpanel-zoomcontrols'><div class='pv-toolbarpanel-zoomslider'></div></div>";
         toolbarPanel += "<div class='pv-toolbarpanel-viewcontrols'></div>";
@@ -5068,7 +5080,10 @@ PivotViewer.Views.DeepZoomItem = Object.subClass({    init: function (ItemId, DZ
             var infopanelDetails = $('.pv-infopanel-details');
             infopanelDetails.empty();
             if (selectedItem.Description != undefined && selectedItem.Description.length > 0) {
-                infopanelDetails.append("<div class='pv-infopanel-detail-description' style='height:100px;'>" + selectedItem.Description + "</div><div class='pv-infopanel-detail-description-more'>More</div>");
+
+                var parsedHtml = $.parseHTML(selectedItem.Description)[0];
+                infopanelDetails.append("<div class='pv-infopanel-detail-description' style='height:100px;'>"+parsedHtml.textContent+"</div><div class='pv-infopanel-detail-description-more'>More</div>");
+
             }
             // nav arrows...
             if (selectedItem.Id == _filterItems[0].Id && selectedItem == _filterItems[_filterItems.length - 1]) {

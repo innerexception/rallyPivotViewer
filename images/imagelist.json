@@ -1,6 +1,10 @@
 {
 	"ImageFiles": [
 		"defect.jpg",
-		"userStory.jpg"
+		"userStory.jpg",
+        "unknown.jpg",
+        "feature.jpg",
+        "initiative.jpg",
+        "task.jpg"
 	]
 }

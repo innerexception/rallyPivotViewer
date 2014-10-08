@@ -18,7 +18,7 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
         this.collection = collection;
         this.collection.CollectionBaseNoProxy = this.JSONUriNoProxy;
         this.collection.CollectionBase = this.JSONUri;
-
+        this.collection.BrandImage = location.origin+'/rallypivotviewer/images/logo.jpg';
         this.data = {};
         this.data.CollectionName = 'Artifacts in Kumquats';
         this.data.FacetCategories = {
@@ -30,25 +30,7 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
                     "IsFilterVisible": "true"
                 },
                 {
-                    "Name": "Creation Date",
-                    "Type": "DateTime",
-                    "IsFilterVisible": "true",
-                    "IsMetaDataVisible": "true"
-                },
-                {
-                    "Name": "Expedite",
-                    "Type": "String",
-                    "IsFilterVisible": "true",
-                    "IsMetaDataVisible": "true"
-                },
-                {
                     "Name": "Defect Status",
-                    "Type": "String",
-                    "IsFilterVisible": "true",
-                    "IsMetaDataVisible": "true"
-                },
-                {
-                    "Name": "Blocked",
                     "Type": "String",
                     "IsFilterVisible": "true",
                     "IsMetaDataVisible": "true"
@@ -60,18 +42,6 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
                     "IsMetaDataVisible": "true"
                 },
                 {
-                    "Name": "Ready",
-                    "Type": "String",
-                    "IsFilterVisible": "true",
-                    "IsMetaDataVisible": "true"
-                },
-                {
-                    "Name": "Closed Date",
-                    "Type": "DateTime",
-                    "IsFilterVisible": "true",
-                    "IsMetaDataVisible": "true"
-                },
-                {
                     "Name": "Type",
                     "Type": "String",
                     "IsFilterVisible": "true",
@@ -79,13 +49,6 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
                 },
                 {
                     "Name": "FormattedID",
-                    "Type": "String",
-                    "IsFilterVisible": "true",
-                    "IsMetaDataVisible" : "false",
-                    "IsWordWheelVisible" : "true"
-                },
-                {
-                    "Name": "Fixed In Build",
                     "Type": "String",
                     "IsFilterVisible": "true",
                     "IsMetaDataVisible" : "false",
@@ -115,6 +78,24 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
                 {
                     "Name": "Task Estimate",
                     "Type": "Number",
+                    "IsMetaDataVisible": "true"
+                },
+                {
+                    "Name": "Project",
+                    "Type": "String",
+                    "IsFilterVisible": "true",
+                    "IsMetaDataVisible": "true"
+                },
+                {
+                    "Name": "Resolution",
+                    "Type": "String",
+                    "IsFilterVisible": "true",
+                    "IsMetaDataVisible": "true"
+                },
+                {
+                    "Name": "Owner",
+                    "Type": "String",
+                    "IsFilterVisible": "true",
                     "IsMetaDataVisible": "true"
                 }
             ]
@@ -175,7 +156,7 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
             this.itemsLoaded = 0;
         }
 
-        for(var i=0; i<this.pageSize; i++){
+        for(var i=0; i< (this.pageSize > data.Results.length ? data.Results.length : this.pageSize); i++){
             var currentItem = data.Results[i];
 
             var myRequest = new XMLHttpRequest();
@@ -211,9 +192,21 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
             newData = newData.HierarchicalRequirement;
             currentType = "User Story";
         }
-        if(newData.Defect){
+        else if(newData.Defect){
             newData = newData.Defect;
             currentType = "Defect";
+        }
+        else if(newData.Initiative){
+            newData = newData.Initiative;
+            currentType = "Initiative";
+        }
+        else if(newData.Feature){
+            newData = newData.Feature;
+            currentType = "Feature";
+        }
+        else if(newData.Task){
+            newData = newData.Task;
+            currentType = "Task";
         }
 
         var item = {};
@@ -221,7 +214,27 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
         item.Description = newData.Description;
         item.Extension = "\n\t";
         item.Id = newId;
-        item.Img= currentType === 'Defect' ? 'defect.jpg' : 'userStory.jpg';
+        switch(currentType){
+            case 'Defect':
+                item.Img = 'defect.jpg';
+                break;
+            case 'Feature':
+                item.Img = 'feature.jpg';
+                break;
+            case 'User Story':
+                item.Img = 'userStory.jpg';
+                break;
+            case 'Initiative':
+                item.Img = 'initiative.jpg';
+                break;
+            case 'Task':
+                item.Img = 'task.jpg';
+                break;
+            default:
+                item.Img = 'unknown.jpg';
+                break;
+        }
+
         item.Href='https://rally1.rallydev.com/#/'+currentProject+"/detail/"+currentType+"/"+newData.ObjectID;
 
         item.Facets = {
@@ -237,27 +250,9 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
             },
             {
                 "String": {
-                    "Value": newData.Expedite ? "true" : "false"
-                },
-                "Name": "Expedite"
-            },
-            {
-                "String": {
                     "Value": newData.DefectStatus ? newData.DefectStatus : ""
                 },
                 "Name": "Defect Status"
-            },
-            {
-                "DateTime": {
-                    "Value": newData.CreationDate ? newData.CreationDate : ""
-                },
-                "Name": "Creation Date"
-            },
-            {
-                "String": {
-                    "Value": newData.Blocked ? "true" : "false"
-                },
-                "Name": "Blocked"
             },
             {
                 "String": {
@@ -272,28 +267,10 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
                 "Name": "Type"
             },
             {
-                "DateTime":{
-                    "Value": newData.AcceptedDate ? newData.AcceptedDate : ""
-                },
-                "Name": "Accepted Date"
-            },
-            {
-                "String": {
-                    "Value": newData.Ready ? "true" : "false"
-                },
-                "Name": "Ready"
-            },
-            {
                 "String":{
                     "Value": newData.FormattedID ? newData.FormattedID : ""
                 },
                 "Name": "FormattedID"
-            },
-            {
-                "String":{
-                    "Value": newData.FixedInBuild ? newData.FixedInBuild : ""
-                },
-                "Name": "Fixed In Build"
             },
             {
                 "String":{
@@ -309,7 +286,7 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
             },
             {
                 "String":{
-                    "Value": newData.State ? newData.State : ""
+                    "Value": newData.State ? typeof newData.State === "object" ? newData.State._refObjectName : newData.State : ""
                 },
                 "Name": "State"
             },
@@ -320,10 +297,22 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
                 "Name": "Task Estimate"
             },
             {
-                "DateTime":{
-                    "Value": newData.ClosedDate ? newData.ClosedDate : ""
+                "String":{
+                    "Value": newData.Project ? newData.Project._refObjectName : ""
                 },
-                "Name": "Closed Date"
+                "Name": "Project"
+            },
+            {
+                "String":{
+                    "Value": newData.Resolution ? newData.Resolution : ""
+                },
+                "Name": "Resolution"
+            },
+            {
+                "String":{
+                    "Value": newData.Owner? newData.Owner._refObjectName ? newData.Owner._refObjectName : newData.Owner : ""
+                },
+                "Name": "Owner"
             }
         );
 
@@ -332,6 +321,7 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
         $('#lblLoading').text("Loaded: "+this.itemsLoaded + " / " + this.totalItems);
 
         if(this.itemsLoaded === this.totalItems){
+            $('#lblLoading').text("Rendering Now...");
             this._continueLoad(this.data);
         }
 
