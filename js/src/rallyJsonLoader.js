@@ -309,10 +309,18 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
                 "Name": "Resolution"
             },
             {
-                "String":{
-                    "Value": newData.Owner? newData.Owner._refObjectName ? newData.Owner._refObjectName : newData.Owner : ""
-                },
+                "String":[
+                    {
+                        "Value": newData.Owner? newData.Owner._refObjectName ? newData.Owner._refObjectName : newData.Owner : ""
+                    }
+                ],
                 "Name": "Owner"
+            },
+            {
+                "Object":{
+                    "Data": this._getImage(newData.Owner? newData.Owner._ref.split('/')[newData.Owner._ref.split('/').length-1]:null)
+                },
+                "Name": "OwnerImage"
             }
         );
 
@@ -412,6 +420,10 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
                             value.Href = data.Items.Item[i].Facets.Facet[j].Link[k].Href;
                             values.push(value);
                         }
+                    }
+                    else if (data.Items.Item[i].Facets.Facet[j].Object != undefined) {
+                        var value = new PivotViewer.Models.FacetValue(data.Items.Item[i].Facets.Facet[j].Object.Data);
+                        values.push(value);
                     } else if (data.Items.Item[i].Facets.Facet[j].String != undefined) {
                         if ( data.Items.Item[i].Facets.Facet[j].String.length > 0) {
                             for (k = 0; k < data.Items.Item[i].Facets.Facet[j].String.length; k++) {
@@ -491,6 +503,14 @@ PivotViewer.Models.Loaders.JSONLoader = PivotViewer.Models.Loaders.ICollectionLo
         if (data.Items.Item.length > 0)
             $.publish("/PivotViewer/Models/Collection/Loaded", null);
 
+    },
+    _getImage:function(path){
+        if(path){
+            var img = new Image;
+            img.src = 'https://rally1.rallydev.com/slm/profile/image/'+path+'/25.sp';
+            return img;
+        }
+        return null;
     }
 
 });

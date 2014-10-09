@@ -374,7 +374,8 @@ PivotViewer.Models.FacetType = {
 	Number: "Number",
 	DateTime: "DateTime",
 	Link: "Link",
-    Boolean: "Boolean"
+    Boolean: "Boolean",
+    Object: "Object"
 };
 //
 //  HTML5 PivotViewer
@@ -3403,24 +3404,26 @@ PivotViewer.Views.Tile = Object.subClass({
         var imgXOffset=15;
         var imgYOffset=20;
         var drawText = true;
-        var lineWidth = 3;
+        var lineWidth = 2;
         var lineoffsetx = 2, lineoffsety = 2;
         var drawExtendedText = false;
+        var drawOwnerImage = false;
 
         var completeImageHeight = this._controller.GetHeight(this.facetItem.Img);
         var displayHeight = this.height - 8;
 
-        if(displayHeight < completeImageHeight){
+        if(displayHeight < completeImageHeight+20){
             //Render small layout
             imgXOffset = 1;
             imgYOffset = 1;
             drawText = false;
-            lineWidth = 2;
+            lineWidth = 1;
         }
-        if(displayHeight > 300){
+        if(displayHeight > 350){
             //Render large layout
             drawExtendedText = true;
-            lineWidth = 4;
+            drawOwnerImage = true;
+            lineWidth = 3;
             lineoffsetx = 4;
             lineoffsety = 4;
         }
@@ -3433,48 +3436,48 @@ PivotViewer.Views.Tile = Object.subClass({
             if(currentFacet.Name === 'Type'){
                 if(currentFacet.FacetValues[0].Value === 'Defect'){
                     this._drawImage(this._controller._items[0].Images[0], this, imgXOffset, imgYOffset);
+                    this._drawBorder('#f9a814', this, lineWidth, lineoffsetx, lineoffsety);
                 }
                 if(currentFacet.FacetValues[0].Value === 'User Story'){
                     this._drawImage(this._controller._items[1].Images[0], this, imgXOffset, imgYOffset);
+                    this._drawBorder('#00a9e0', this, lineWidth, lineoffsetx, lineoffsety);
                 }
                 if(currentFacet.FacetValues[0].Value === 'Initiative'){
                     this._drawImage(this._controller._items[4].Images[0], this, imgXOffset, imgYOffset);
+                    this._drawBorder('#8dc63f', this, lineWidth, lineoffsetx, lineoffsety);
                 }
                 if(currentFacet.FacetValues[0].Value === undefined){
                     this._drawImage(this._controller._items[2].Images[0], this, imgXOffset, imgYOffset);
                 }
                 if(currentFacet.FacetValues[0].Value === 'Feature'){
                     this._drawImage(this._controller._items[3].Images[0], this, imgXOffset, imgYOffset);
+                    this._drawBorder('#8dc63f', this, lineWidth, lineoffsetx, lineoffsety);
                 }
                 if(currentFacet.FacetValues[0].Value === 'Task'){
                     this._drawImage(this._controller._items[5].Images[0], this, imgXOffset, imgYOffset);
+                    this._drawBorder('#8dc63f', this, lineWidth, lineoffsetx, lineoffsety);
                 }
             }
-            if(currentFacet.Name === 'Blocked'){
-                if(currentFacet.FacetValues[0].Value === 'true'){
-                    this._drawBorder('#FF0000', this, lineWidth, lineoffsetx, lineoffsety);
+            if(currentFacet.Name === 'OwnerImage' && drawOwnerImage){
+                if(currentFacet.FacetValues[0].Value){
+                    this._drawOwnerImage(currentFacet.FacetValues[0].Value, this, imgXOffset+350, imgYOffset);
                 }
             }
             if(currentFacet.Name === 'Ready'){
                 if(currentFacet.FacetValues[0].Value ==='true'){
-                    this._drawBorder('#00FF00', this, lineWidth, lineoffsetx, lineoffsety);
-                }
-            }
-            if(currentFacet.Name === 'Accepted Date'){
-                if(currentFacet.FacetValues[0].Value != ""){
-                    this._drawBorder('#0000FF', this, lineWidth, lineoffsetx, lineoffsety);
+
                 }
             }
             if(currentFacet.Name === 'FormattedID' && drawText){
                 this._drawText(currentFacet.FacetValues[0].Value, this, 15, 15);
             }
             if(currentFacet.Name === 'Name' && drawExtendedText){
-                this._drawText(currentFacet.FacetValues[0].Value, this, 15, 300);
+                this._drawText(currentFacet.FacetValues[0].Value, this, 15, 350);
             }
         }
 
         if (this._selected) {
-            this._drawBorder('#92C4E1', this, lineWidth, lineoffsetx, lineoffsety);
+            this._drawBorder('#b81b10', this, lineWidth+2, lineoffsetx, lineoffsety);
         }
 
     },
@@ -3485,19 +3488,22 @@ PivotViewer.Views.Tile = Object.subClass({
     },
 
     _drawImage: function(image, tileObj, imgXOffset, imgYOffset){
-        //if the collection contains an image
-        //var completeImageWidth = tileObj._controller.GetWidth(tileObj.facetItem.Img);
-        //var levelWidth = Math.ceil(completeImageWidth / Math.pow(2, tileObj._controller.GetMaxLevel(tileObj.facetItem.Img) - tileObj._level));
-
-        //var displayWidth = Math.ceil(tileObj._controller.GetWidthForImage(tileObj.facetItem.Img, displayHeight));
 
         //Image will need to be scaled to get the displayHeight
         var scale = tileObj.height/tileObj.origheight;
-        if(scale > 3)
-            scale = 3;
+        if(scale > 2)
+            scale = 2;
 
         var imageTileHeight = scale > 1.1 ? Math.ceil(tileObj.height * (1/scale))-2 : Math.ceil(tileObj.height * 0.8)-2;
-//        imageTileHeight = Math.min(imageTileHeight, image.height*3);
+
+        tileObj.context.drawImage(image, tileObj._locations[tileObj.selectedLoc].x+imgXOffset , tileObj._locations[tileObj.selectedLoc].y+imgYOffset, imageTileHeight, imageTileHeight);
+
+    },
+    _drawOwnerImage: function(image, tileObj, imgXOffset, imgYOffset){
+
+        //Image will need to be scaled to get the displayHeight
+
+        var imageTileHeight = image.height*2;
 
         tileObj.context.drawImage(image, tileObj._locations[tileObj.selectedLoc].x+imgXOffset , tileObj._locations[tileObj.selectedLoc].y+imgYOffset, imageTileHeight, imageTileHeight);
 
@@ -4157,7 +4163,7 @@ PivotViewer.Views.DeepZoomItem = Object.subClass({    init: function (ItemId, DZ
                         if (currentItemFacet.Name == currentFacetCategory.Name) {
                             for (var k = 0; k < currentItemFacet.FacetValues.length; k++) {
                                 if (currentFacetCategory.Type == PivotViewer.Models.FacetType.String ||
-                                    currentFacetCategory.Type == PivotViewer.Models.FacetType.Link) {
+                                    currentFacetCategory.Type == PivotViewer.Models.FacetType.Link && currentItemFacet.FacetValues[k].Value != "") {
                                     var found = false;
                                     var itemId = "pv-facet-item-" + CleanName(currentItemFacet.Name) + "__" + CleanName(currentItemFacet.FacetValues[k].Value);
                                     for (var n = _facetItemTotals.length - 1; n > -1; n -= 1) {
@@ -5037,7 +5043,7 @@ PivotViewer.Views.DeepZoomItem = Object.subClass({    init: function (ItemId, DZ
 
     CleanName = function (uncleanName) {
         var name = '';
-        if(uncleanName){
+        if(typeof uncleanName === 'string'){
             name = uncleanName.replace(/[^\w]/gi, '_');
             _nameMapping[name] = uncleanName;
         }
